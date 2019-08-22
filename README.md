@@ -90,4 +90,35 @@ selected.
 ### `close`
 The close event is launched when the component is closed and display a list of sectioned values.
 
+## CSS
+
+All general CSS style can be personalized directly: `width`, `font-size`, `font-family`, `color`, 
+`background-color`, etc. For other special styles you can use CSS Variables.
+
+### Variables
+
+#### `--todojs-disabled-bg-color`
+
+Background color when the control is disabled. By default `lightgray`.
+
+#### `--todojs-mark-color`
+                   
+Check mark's color. By default `white`.
+
+#### `--todojs-mark-bg-color`
+
+Check mark's default background color. By default `#eee`.
+
+#### `--todojs-mark-checked-bg-color`
+
+Check mark's checked background color. By default `#2196F3`.
+                   
+#### `--todojs-label-hover-bg-color`
+                                  
+Check label's mouse over background color. By default `#eee`.
+
+#### `--todojs-label-focus-bg-color`
+                             
+Check label's mouse over background color by default. By default `lightgrey`.
+
 ./

@@ -112,44 +112,44 @@
       
       // Create Shadow DOMs
       this.attachShadow ({mode : 'open'});
-      
+  
       // Observe Light DOM changes
-      new MutationObserver (
-        (mutations) => {
-          let refresh = false;
-          let update  = false;
-          let change  = false;
-          for (let mutation of mutations) {
-            if (mutation.attributeName !== 'class') {
-              refresh = true;
+        new MutationObserver (
+          (mutations) => {
+            let refresh = false;
+            let update  = false;
+            let change  = false;
+            for (let mutation of mutations) {
+              if (mutation.attributeName !== 'class') {
+                refresh = true;
+              }
+              if (mutation.attributeName === 'selected') {
+                change = true;
+              }
+              if (mutation.type === 'childList') {
+                update = true;
+              }
             }
-            if (mutation.attributeName === 'selected') {
-              change = true;
+            if (refresh) {
+              this[ RENDER_REFRESH ] ();
             }
-            if (mutation.type === 'childList') {
-              update = true;
+            if (update) {
+              this.dispatchEvent (new Event ("update"));
+            }
+            if (change) {
+              this.dispatchEvent (new Event ("change"));
             }
           }
-          if (refresh) {
-            this[ RENDER_REFRESH ] ();
+        ).observe (
+          this,
+          {
+            subtree         : true,
+            attributes      : true,
+            attributeFilter : [ 'selected' ],
+            childList       : true,
+            characterData   : true
           }
-          if (update) {
-            this.dispatchEvent (new Event ("update"));
-          }
-          if (change) {
-            this.dispatchEvent (new Event ("change"));
-          }
-        }
-      ).observe (
-        this,
-        {
-          subtree         : true,
-          attributes      : true,
-          attributeFilter : [ 'selected' ],
-          childList       : true,
-          characterData   : true
-        }
-      );
+        );
       
       this[ RENDER_INITIAL ] ();
       
@@ -162,7 +162,7 @@
     }
     attributeChangedCallback (name, oldValue, newValue) {
       if (name === 'disabled') {
-        if (newValue === '') {
+        if (['', 'true', '1', 'yes'].includes(newValue)) {
           this.removeAttribute('open');
           this.setAttribute('last-tabindex', this.getAttribute('tabindex'));
           this.removeAttribute('tabindex');
@@ -170,7 +170,7 @@
           this.setAttribute('tabindex', this.getAttribute('last-tabindex') || '0');
         }
       } else if (name === 'open') {
-        if (newValue === '') {
+        if (['', 'true', '1', 'yes'].includes(newValue)) {
           if (this.hasAttribute ('disabled')) {
             this.removeAttribute ('open');
           } else {
@@ -416,8 +416,9 @@
     color              : #000;
     background-color   : #FFF;
   }
-  :host([disabled]) #selection #selected {
-    background-color   : var(--todojs-disabled-gbcolor, lightgray);
+  :host([disabled]) #selection {
+    background-color   : var(--todojs-disabled-bg-color, lightgray);
+    mix-blend-mode     : multiply;
   }
   #selection {
     position           : relative;
@@ -579,7 +580,7 @@
   </p>
   <div id="checkboxes"></div>
 </div>`;
-      
+  
       const selection  = this.shadowRoot.querySelector ('#selection');
       const dropdown   = this.shadowRoot.querySelector ('#dropdown');
       const search     = this.shadowRoot.querySelector ('#search');

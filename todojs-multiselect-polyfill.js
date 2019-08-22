@@ -158,7 +158,7 @@
           }
         );
       } else {
-  
+
         let prevOptions = [];
         const that      = this;
         (function observer () {
@@ -209,7 +209,7 @@
           }
           setTimeout (observer, 120);
         }) ();
-  
+
       }
 
       this[ RENDER_INITIAL ] ();
@@ -223,7 +223,7 @@
     }
     attributeChangedCallback (name, oldValue, newValue) {
       if (name === 'disabled') {
-        if (newValue === '') {
+        if (['', 'true', '1', 'yes'].includes(newValue)) {
           this.removeAttribute ('open');
           this.setAttribute ('last-tabindex', this.getAttribute ('tabindex'));
           this.removeAttribute ('tabindex');
@@ -231,7 +231,7 @@
           this.setAttribute ('tabindex', this.getAttribute ('last-tabindex') || '0');
         }
       } else if (name === 'open') {
-        if (newValue === '') {
+        if (['', 'true', '1', 'yes'].includes(newValue)) {
           if (this.hasAttribute ('disabled')) {
             this.removeAttribute ('open');
           } else {
@@ -465,12 +465,12 @@
     [ RENDER_INITIAL ] () {
       
       // Shadow DOM Style
-      this.shadowRoot.innerHTML = `
+      const template = document.createElement('template');
+      template.innerHTML = `
 <link rel="stylesheet"
       href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
 <style>
-  ${HAS_NATIVE_SHADOW ? ':host' : this.tagName }
-  {
+  :host {
     display            : inline-block;
     position           : relative;
     font-family        : Roboto, Arial, sans-serif;
@@ -478,14 +478,11 @@
     color              : #000;
     background-color   : #FFF;
   }
-  
-  ${HAS_NATIVE_SHADOW ?
-    ':host([disabled]) #selection #selected' :
-    `todojs-mutiselect[disabled] ~ ${this.tagName} #selection #selected` }
-  {
-    background-color   : lightgray;
+  :host([disabled]) #selection {
+    background-color   : var(--todojs-disabled-bg-color, lightgray);
+    mix-blend-mode     : multiply;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #selection {
+  #selection {
     position           : relative;
     cursor             : pointer;
     min-width          : 14em;
@@ -494,7 +491,7 @@
     border             : 1px solid lightgray;
     background-color   : inherit;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #selection #selected {
+  #selection #selected {
     position           : absolute;
     top                : 0;
     left               : 0;
@@ -505,7 +502,7 @@
     overflow           : hidden;
     text-overflow      : ellipsis;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #selection #selected:after {
+  #selection #selected:after {
     position           : absolute;
     content            : "";
     top                : calc(1em - 3px);
@@ -516,11 +513,11 @@
     border-style       : solid;
     border-color       : #000 transparent transparent transparent;
   }
-  ${HAS_NATIVE_SHADOW ? `:host([open])` : `${this.tagName}[open]` }  #selection #selected:after {
+  :host([open]) #selection #selected:after {
     border-color       : transparent transparent #000 transparent;
     top                : calc( 1em - 8px);
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown {
+  #dropdown {
     display            : none;
     left               : 0;
     right              : 0;
@@ -536,10 +533,10 @@
     border-width       : 0 1px 1px 1px;
     z-index            : 20;
   }
-  ${HAS_NATIVE_SHADOW ? `:host([open])` : `${this.tagName}[open]` } #dropdown {
+  :host([open]) #dropdown {
     display            : block;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #search {
+  #search {
     position           : absolute;
     height             : 1.6em;
     width              : calc( 100% - 36px - 1em);
@@ -550,16 +547,16 @@
     font-family        : inherit;
     font-size          : inherit;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #search:focus {
+  #search:focus {
     outline            : none;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #search::-webkit-input-placeholder,
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #search::placeholder {
+  #search::-webkit-input-placeholder,
+  #search::placeholder {
     color              : inherit;
     opacity            : 0.4;
     font-style         : italic;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group {
+  #dropdown .group {
     display            : block;
     position           : relative;
     height             : 1em;
@@ -571,17 +568,17 @@
     -ms-user-select    : none;
     user-select        : none;
    }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group.hidden {
+  #dropdown .group.hidden {
     display            : none;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .option {
+  #dropdown .group .option {
     position           : absolute;
     opacity            : 0;
     cursor             : pointer;
     height             : 0;
     width              : 0;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .mark {
+  #dropdown .group .mark {
     cursor             : pointer;
     position           : absolute;
     top                : 0.5em;
@@ -591,24 +588,24 @@
     background-color   : var(--todojs-mark-bg-color, #eee);
     z-index            : 20;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .option:checked ~ .mark {
+  #dropdown .group .option:checked ~ .mark {
     background-color   : var(--todojs-mark-checked-bg-color, #2196F3);
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group:hover .option ~ .mark ~ .label {
+  #dropdown .group:hover .option ~ .mark ~ .label {
     background-color   : var(--todojs-label-hover-bg-color, #eee);
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .option:focus ~ .mark ~ .label {
+  #dropdown .group .option:focus ~ .mark ~ .label {
     background-color   : var(--todojs-label-focus-bg-color, lightgrey);
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .mark:after {
+  #dropdown .group .mark:after {
     content            : "";
     position           : absolute;
     display            : none;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .option:checked ~ .mark:after {
+  #dropdown .group .option:checked ~ .mark:after {
     display            : block;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .mark:after {
+  #dropdown .group .mark:after {
     left               : 0.35em;
     top                : 0.1em;
     width              : 0.2em;
@@ -620,7 +617,7 @@
     -ms-transform      : rotate(45deg);
     transform          : rotate(45deg);
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group .label {
+  #dropdown .group .label {
     cursor             : pointer;
     display            : block;
     position           : absolute;
@@ -630,7 +627,7 @@
     right              : 0;
     padding            : 0.5em 2em;
   }
-  ${HAS_NATIVE_SHADOW ? '' : this.tagName} #dropdown .group.select-all {
+  #dropdown .group.select-all {
     border-bottom      : 1px dotted darkgray;
   }
 </style>
@@ -646,6 +643,9 @@
   <div id="checkboxes"></div>
 </div>`;
   
+      window.ShadyCSS && ShadyCSS.prepareTemplate(template, 'todojs-multiselect');
+      this.shadowRoot.appendChild( template.content );
+      
       const selection  = this.shadowRoot.querySelector ('#selection');
       const dropdown   = this.shadowRoot.querySelector ('#dropdown');
       const search     = this.shadowRoot.querySelector ('#search');
